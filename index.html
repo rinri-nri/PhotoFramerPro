@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Framer & AI Mesh Gradient v36.0</title>
+    <title>Photo Framer & AI Mesh Gradient v50.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;700&family=Noto+Sans+JP:wght@300&family=Noto+Serif+JP:wght@300&family=Cormorant+Garamond:ital,wght@1,300;1,700&family=Rubik+Scribble&family=Playfair+Display:ital,wght@1,700&family=M+PLUS+Rounded+1c:wght@300&family=Kiwi+Maru:wght@300&family=Shippori+Mincho&family=Yuji+Syuku&family=Montserrat:wght@300&family=Oswald:wght@300&family=Lora:ital,wght@1,400&family=Kaisei+Opti&family=Caveat&family=Satisfy&family=RocknRoll+One&family=DotGothic16&display=swap" rel="stylesheet">
+    <!-- EXIF Library -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <!-- Google Fonts (COMPLETE 34 TYPES) -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;700&family=Noto+Sans+JP:wght@300&family=Noto+Serif+JP:wght@300&family=Cormorant+Garamond:ital,wght@1,300;1,700&family=Rubik+Scribble&family=Playfair+Display:ital,wght@1,700&family=M+PLUS+Rounded+1c:wght@300&family=Kiwi+Maru:wght@300&family=Shippori+Mincho&family=Yuji+Syuku&family=Montserrat:wght@300&family=Oswald:wght@300&family=Lora:ital,wght@1,400&family=Kaisei+Opti&family=Caveat&family=Satisfy&family=RocknRoll+One&family=DotGothic16&family=Dela+Gothic+One&family=Hachi+Maru+Pop&family=Potta+One&family=BIZ+UDPGothic:wght@400;700&family=Pacifico&family=Lobster&family=Cinzel:wght@400;700&family=Righteous&family=Abril+Fatface&family=Sacramento&family=Permanent+Marker&family=Kurenaido&family=Bangers&family=Fredoka+One&family=Monoton&family=Rubik+Puddles&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-page: #f8fafc;
             --bg-card: #ffffff;
-            --text-main: #0f172a; /* Darker slate for better contrast */
+            --text-main: #0f172a;
             --border-ui: #cbd5e1;
         }
 
@@ -110,22 +112,13 @@
             transition: all 0.2s;
             cursor: pointer;
         }
-        .font-option:hover {
-            background-color: rgba(99, 102, 241, 0.1);
-        }
-        input[name="fontFamily"]:checked + span {
+        .font-option:hover { background-color: rgba(99, 102, 241, 0.1); }
+        input[name="fontFamily"]:checked + span,
+        input[name="textColor"]:checked + span,
+        input[name="exifAlign"]:checked + span,
+        input[name="exifWeight"]:checked + span {
             color: #6366f1;
             font-weight: 700;
-        }
-
-        .tech-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .tech-table th, .tech-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-ui);
         }
 
         .social-link {
@@ -139,17 +132,19 @@
             font-weight: 500;
         }
 
-        /* Input specific styles for contrast */
-        input::placeholder {
-            color: #64748b;
-            opacity: 0.8;
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+            background: #6366f1; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
         }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #e2e8f0; border-radius: 4px; }
+        .dark input[type=range]::-webkit-slider-runnable-track { background: #374151; }
     </style>
 </head>
 <body class="p-4 md:p-8 dark">
     <div id="loadingOverlay" class="loading-overlay">
         <div class="spinner mb-4"></div>
-        <p class="text-indigo-500 font-bold animate-pulse text-lg">色彩をバランス調整中...</p>
+        <p class="text-indigo-500 font-bold animate-pulse text-lg">色彩と書体をロード中...</p>
     </div>
 
     <!-- Theme Toggle -->
@@ -162,7 +157,6 @@
     </div>
 
     <div class="max-w-4xl mx-auto space-y-6 mb-8">
-        <!-- Main Tool Card -->
         <div class="card p-6 rounded-3xl shadow-2xl border dark:border-gray-700">
             <h1 class="text-2xl font-bold mb-6 flex items-center gap-3" style="color: var(--text-main)">
                 <i data-lucide="palette" class="w-7 h-7 text-indigo-500"></i>
@@ -170,76 +164,6 @@
             </h1>
 
             <div class="space-y-6">
-                <!-- Text Input -->
-                <div>
-                    <label for="customText" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
-                        <i data-lucide="type" class="w-4 h-4 text-indigo-500"></i> 左下に表示する文章
-                    </label>
-                    <input type="text" id="customText" placeholder="例: Timeless Moments" class="w-full p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition-all bg-transparent text-lg font-light italic" style="color: var(--text-main)">
-                </div>
-
-                <!-- Font Selection -->
-                <details class="group border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30 overflow-hidden">
-                    <summary class="flex items-center justify-between p-3 cursor-pointer list-none select-none">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="case-sensitive" class="w-4 h-4 text-indigo-500"></i>
-                            <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">フォント・コレクション</span>
-                        </div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 opacity-50 group-open:rotate-180 transition-transform"></i>
-                    </summary>
-                    <div class="p-4 border-t dark:border-gray-600 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 bg-white dark:bg-gray-900/50 max-h-[300px] overflow-y-auto">
-                        <!-- Iterating through font list -->
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Zen Maru Gothic" checked class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Zen Maru Gothic'; color: var(--text-main)">Zen Maru Gothic</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Noto Sans JP" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Noto Sans JP'; color: var(--text-main)">Noto Sans JP</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Shippori Mincho" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Shippori Mincho'; color: var(--text-main)">しっぽり明朝</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Kiwi Maru" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Kiwi Maru'; color: var(--text-main)">キウイ丸</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="M PLUS Rounded 1c" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'M PLUS Rounded 1c'; color: var(--text-main)">M PLUS Rounded</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Kaisei Opti" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Kaisei Opti'; color: var(--text-main)">解星オプティ</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Cormorant Garamond" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs italic" style="font-family: 'Cormorant Garamond'; color: var(--text-main)">Cormorant Garamond</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Montserrat" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Montserrat'; color: var(--text-main)">Montserrat</span>
-                        </label>
-                        <label class="font-option flex items-center gap-2 p-2 rounded-lg border dark:border-gray-700">
-                            <input type="radio" name="fontFamily" value="Caveat" class="w-4 h-4 accent-indigo-500">
-                            <span class="text-xs" style="font-family: 'Caveat'; color: var(--text-main)">Caveat</span>
-                        </label>
-                    </div>
-                </details>
-
-                <!-- Date Toggle -->
-                <div class="flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
-                        <span class="text-sm font-bold" style="color: var(--text-main)">日付を自動入力する</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="dateToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
                 <!-- Inputs -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-2xl p-4 text-center hover:border-indigo-400 transition-all bg-white dark:bg-gray-800/50">
@@ -260,380 +184,386 @@
                     </div>
                 </div>
 
-                <!-- Generate Buttons -->
-                <div class="space-y-3">
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button id="generateBtn" class="flex-1 bg-white dark:bg-gray-700 border-2 border-slate-800 dark:border-gray-500 hover:bg-slate-800 dark:hover:bg-gray-600 hover:text-white text-slate-800 dark:text-white font-bold py-3 px-4 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
-                            <i data-lucide="zap" class="w-4 h-4"></i> シンプル生成
-                        </button>
-                        <button id="aiGenerateBtn" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] text-sm flex items-center justify-center gap-2">
-                            <i data-lucide="sparkles" class="w-4 h-4"></i> AI色彩解析
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-slate-500 dark:text-gray-500 text-center italic font-medium">
-                        ※ AI解析は混雑状況により制限がかかる場合があります。
-                    </p>
-                </div>
-
-                <!-- Result -->
-                <div id="errorBox" class="hidden p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-xl text-sm border-2 border-red-200 dark:border-red-800 font-medium"></div>
-                <div id="resultSection" class="hidden space-y-6">
-                    <div class="canvas-container bg-black p-1 border-4 border-slate-200 dark:border-gray-700">
-                        <canvas id="mainCanvas"></canvas>
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <button id="downloadBtn" class="flex-1 max-w-xs bg-slate-900 dark:bg-indigo-600 hover:bg-black dark:hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full flex items-center justify-center gap-3 transition-all shadow-xl hover:shadow-2xl text-lg">
-                            <i data-lucide="download" class="w-6 h-6"></i> 画像を保存
-                        </button>
-                        <button id="shareBtn" class="flex-1 max-w-xs bg-white dark:bg-gray-800 border-2 border-slate-900 dark:border-indigo-400 hover:bg-slate-50 dark:hover:bg-gray-700 text-slate-900 dark:text-indigo-400 font-bold py-4 px-8 rounded-full flex items-center justify-center gap-3 transition-all shadow-xl hover:shadow-2xl text-lg">
-                            <i data-lucide="share-2" class="w-6 h-6"></i> SNSで共有
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- About Developer Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md flex flex-col justify-between">
-                <div>
-                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-                        <i data-lucide="heart" class="w-5 h-5"></i> 開発者の想い
-                    </h2>
-                    <p class="text-sm leading-relaxed font-medium mb-4" style="color: var(--text-main)">
-                        「便利で使いやすくてオシャレな写真用のジェネレーターないかなー」と思っていたのですが、無かったので自分で作りました！
-                    </p>
-                    <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800/50 mb-4">
-                        <p class="text-xs font-bold text-indigo-700 dark:text-indigo-300 mb-1 flex items-center gap-1">
-                            <i data-lucide="megaphone" class="w-3 h-3"></i> 超ユーザーフレンドリー宣言
-                        </p>
-                        <p class="text-[11px] leading-relaxed font-medium text-slate-700 dark:text-gray-300">
-                            このページは完全無料・広告なしで運営しています。AI使用料は開発者が負担しています！もし気に入ったら、活動をサポートいただけると嬉しいです。ちなみに、ブラウザの設定によっては、ライトモードにした場合に文字が潰れて読めなくなることがあります。なので、基本的にはダークモード推奨です。
-                        </p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap-2 pt-2">
-                    <a href="https://github.com/rinri-nri" target="_blank" class="social-link bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-gray-800 dark:text-gray-200">
-                        <i data-lucide="github" class="w-4 h-4"></i> GitHub
-                    </a>
-                    <a href="https://twitter.com/rinri_nri" target="_blank" class="social-link bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-300">
-                        <i data-lucide="twitter" class="w-4 h-4"></i> @rinri_nri
-                    </a>
-                    <a href="https://note.com/rinri_aho" target="_blank" class="social-link bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-green-900/30 dark:text-green-300">
-                        <i data-lucide="book-open" class="w-4 h-4"></i> note
-                    </a>
-                    <a href="https://ko-fi.com/rinrinri" target="_blank" class="social-link bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300">
-                        <i data-lucide="coffee" class="w-4 h-4"></i> 寄付
-                    </a>
-                </div>
-            </div>
-
-            <!-- Portfolio -->
-            <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-pink-600 dark:text-pink-400">
-                    <i data-lucide="box" class="w-5 h-5"></i> 他の制作物
-                </h2>
+                <!-- Text Input & Size Slider -->
                 <div class="space-y-4">
-                    <div class="flex gap-3">
-                        <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i data-lucide="utensils" class="w-5 h-5 text-orange-600"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold" style="color: var(--text-main)">AI自動レシピ提案アプリ</p>
-                            <p class="text-[10px] text-slate-600 dark:text-gray-400 font-medium">冷蔵庫の中身から、AIが献立を瞬時に考えます。</p>
+                    <div>
+                        <label for="customText" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
+                            <i data-lucide="type" class="w-4 h-4 text-indigo-500"></i> 左下に表示する文章
+                        </label>
+                        <input type="text" id="customText" placeholder="例: Timeless Moments" class="w-full p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition-all bg-transparent text-lg font-light italic" style="color: var(--text-main)">
+                    </div>
+                    <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
+                        <label for="userTextSizeRange" class="block text-xs font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
+                            <i data-lucide="maximize" class="w-3 h-3 text-indigo-500"></i> テキストのサイズ
+                        </label>
+                        <input type="range" id="userTextSizeRange" min="0.05" max="0.30" step="0.01" value="0.18" class="w-full">
+                    </div>
+                </div>
+
+                <!-- Settings Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <details class="group border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30 overflow-hidden">
+                            <summary class="flex items-center justify-between p-3 cursor-pointer list-none select-none">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="case-sensitive" class="w-4 h-4 text-indigo-500"></i>
+                                    <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">フォント・コレクション (34種)</span>
+                                </div>
+                                <i data-lucide="chevron-down" class="w-4 h-4 opacity-50 group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="p-4 border-t dark:border-gray-600 grid grid-cols-1 gap-2 bg-white dark:bg-gray-900/50 max-h-[250px] overflow-y-auto">
+                                <!-- Japanese Fonts (15) -->
+                                <div class="text-[10px] font-bold text-indigo-500 mt-2">JAPANESE</div>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Zen Maru Gothic" checked class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Zen Maru Gothic';">Zen Maru Gothic</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Shippori Mincho" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Shippori Mincho';">しっぽり明朝</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Noto Sans JP" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Noto Sans JP';">Noto Sans JP</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Noto Serif JP" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Noto Serif JP';">Noto Serif JP</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Dela Gothic One" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Dela Gothic One';">Dela Gothic</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Hachi Maru Pop" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Hachi Maru Pop';">ハチマルポップ</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Potta One" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Potta One';">Potta One</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="BIZ UDPGothic" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'BIZ UDPGothic';">BIZ UDPGothic</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Kiwi Maru" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Kiwi Maru';">キウイ丸</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Yuji Syuku" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Yuji Syuku';">Yuji Syuku</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Kaisei Opti" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Kaisei Opti';">解星オプティ</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="RocknRoll One" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'RocknRoll One';">ロックンロール</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="DotGothic16" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'DotGothic16';">ドットゴシック</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Kurenaido" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Kurenaido';">クレナイド</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="M PLUS Rounded 1c" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'M PLUS Rounded 1c';">M PLUS Rounded</span></label>
+                                <!-- English Fonts (19) -->
+                                <div class="text-[10px] font-bold text-indigo-500 mt-4">ENGLISH</div>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Cinzel" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Cinzel';">CINZEL</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Cormorant Garamond" class="w-3 h-3 accent-indigo-500"><span class="text-xs italic" style="font-family: 'Cormorant Garamond';">Garamond</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Pacifico" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Pacifico';">Pacifico</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Lobster" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Lobster';">Lobster</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Righteous" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Righteous';">Righteous</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Playfair Display" class="w-3 h-3 accent-indigo-500"><span class="text-xs italic" style="font-family: 'Playfair Display';">Playfair</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Abril Fatface" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Abril Fatface';">Abril Fatface</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Montserrat" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Montserrat';">Montserrat</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Satisfy" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Satisfy';">Satisfy</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Sacramento" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Sacramento';">Sacramento</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Permanent Marker" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Permanent Marker';">Marker</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Oswald" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Oswald';">Oswald</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Rubik Scribble" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Rubik Scribble';">Scribble</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Lora" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Lora';">Lora</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Caveat" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Caveat';">Caveat</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Rubik Puddles" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Rubik Puddles';">Puddles</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Monoton" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Monoton';">Monoton</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Bangers" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Bangers';">Bangers</span></label>
+                                <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Fredoka One" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Fredoka One';">Fredoka One</span></label>
+                            </div>
+                        </details>
+
+                        <!-- TEXT COLOR SELECTOR -->
+                        <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
+                            <label class="block text-sm font-bold mb-3 flex items-center gap-2" style="color: var(--text-main)">
+                                <i data-lucide="palette" class="w-4 h-4 text-indigo-500"></i> テキストのカラー
+                            </label>
+                            <div class="flex gap-2">
+                                <label class="flex-1 font-option flex items-center justify-center gap-2 p-2 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800"><input type="radio" name="textColor" value="white" checked class="w-3 h-3 accent-indigo-500"><span class="text-[10px] font-bold">白</span></label>
+                                <label class="flex-1 font-option flex items-center justify-center gap-2 p-2 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800"><input type="radio" name="textColor" value="black" class="w-3 h-3 accent-indigo-500"><span class="text-[10px] font-bold">黒</span></label>
+                                <label class="flex-1 font-option flex items-center justify-center gap-2 p-2 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800"><input type="radio" name="textColor" value="gray" class="w-3 h-3 accent-indigo-500"><span class="text-[10px] font-bold">灰</span></label>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex gap-3">
-                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i data-lucide="graduation-cap" class="w-5 h-5 text-blue-600"></i>
+
+                    <!-- Sliders -->
+                    <div class="space-y-4">
+                        <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
+                            <label for="paddingRange" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
+                                <i data-lucide="frame" class="w-4 h-4 text-indigo-500"></i> 外枠の太さ
+                            </label>
+                            <input type="range" id="paddingRange" min="0.01" max="0.20" step="0.01" value="0.07" class="w-full">
                         </div>
-                        <div>
-                            <p class="text-xs font-bold" style="color: var(--text-main)">AI一言学術サーチ</p>
-                            <p class="text-[10px] text-slate-600 dark:text-gray-400 font-medium">難しい知識も、AIが要約して教えます。</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30 text-center">
+                                <label for="darknessRange" class="block text-[10px] font-bold mb-1 flex items-center justify-center gap-1" style="color: var(--text-main)"><i data-lucide="moon" class="w-3 h-3 text-indigo-500"></i> 暗さ</label>
+                                <input type="range" id="darknessRange" min="0" max="0.9" step="0.01" value="0" class="w-full">
+                            </div>
+                            <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30 text-center">
+                                <label for="brightnessRange" class="block text-[10px] font-bold mb-1 flex items-center justify-center gap-1" style="color: var(--text-main)"><i data-lucide="sun" class="w-3 h-3 text-indigo-500"></i> 明るさ</label>
+                                <input type="range" id="brightnessRange" min="0" max="0.9" step="0.01" value="0" class="w-full">
+                            </div>
                         </div>
                     </div>
-                    <div class="flex gap-3">
-                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i data-lucide="calculator" class="w-5 h-5 text-green-600"></i>
+                </div>
+
+                <!-- EXIF Settings -->
+                <div class="p-4 border-2 border-slate-200 dark:border-gray-600 rounded-2xl bg-slate-50 dark:bg-gray-800/20 space-y-4">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
+                            <div class="flex items-center gap-2"><i data-lucide="camera" class="w-4 h-4 text-indigo-500"></i><span class="text-sm font-bold" style="color: var(--text-main)">EXIFを表示</span></div>
+                            <label class="switch"><input type="checkbox" id="exifToggle" checked><span class="slider"></span></label>
                         </div>
-                        <div>
-                            <p class="text-xs font-bold" style="color: var(--text-main)">塾講師向け算数学習アプリ</p>
-                            <p class="text-[10px] text-slate-600 dark:text-gray-400 font-medium">現役講師が設計した学習効率化ツール。</p>
+                        <div class="flex-1 p-3 border-2 border-slate-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
+                            <label class="block text-xs font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="align-center" class="w-3 h-3 text-indigo-500"></i> 配置</label>
+                            <div class="flex gap-1">
+                                <label class="flex-1 font-option flex items-center justify-center p-1.5 rounded-lg border dark:border-gray-700 bg-slate-50 dark:bg-gray-900"><input type="radio" name="exifAlign" value="left" class="hidden"><span class="text-[10px] font-bold">左</span></label>
+                                <label class="flex-1 font-option flex items-center justify-center p-1.5 rounded-lg border dark:border-gray-700 bg-slate-50 dark:bg-gray-900"><input type="radio" name="exifAlign" value="center" checked class="hidden"><span class="text-[10px] font-bold">中</span></label>
+                                <label class="flex-1 font-option flex items-center justify-center p-1.5 rounded-lg border dark:border-gray-700 bg-slate-50 dark:bg-gray-900"><input type="radio" name="exifAlign" value="right" class="hidden"><span class="text-[10px] font-bold">右</span></label>
+                            </div>
                         </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-3 p-3 border-2 border-slate-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
+                            <div class="flex items-center justify-between">
+                                <label for="exifSizeRange" class="text-xs font-bold flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="text-cursor-input" class="w-3 h-3 text-indigo-500"></i> 文字サイズ</label>
+                                <div class="flex items-center gap-2"><span class="text-[10px] opacity-70">斜体</span><label class="switch scale-75"><input type="checkbox" id="exifItalicToggle"><span class="slider"></span></label></div>
+                            </div>
+                            <input type="range" id="exifSizeRange" min="0.04" max="0.15" step="0.005" value="0.09" class="w-full">
+                        </div>
+                        <div class="p-3 border-2 border-slate-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
+                            <label class="block text-xs font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="bold" class="w-3 h-3 text-indigo-500"></i> 太さ</label>
+                            <div class="flex gap-1">
+                                <label class="flex-1 font-option flex items-center justify-center p-1.5 rounded-lg border dark:border-gray-700 bg-slate-50 dark:bg-gray-900"><input type="radio" name="exifWeight" value="300" checked class="hidden"><span class="text-[10px] font-bold">細</span></label>
+                                <label class="flex-1 font-option flex items-center justify-center p-1.5 rounded-lg border dark:border-gray-700 bg-slate-50 dark:bg-gray-900"><input type="radio" name="exifWeight" value="400" class="hidden"><span class="text-[10px] font-bold">普</span></label>
+                                <label class="flex-1 font-option flex items-center justify-center p-1.5 rounded-lg border dark:border-gray-700 bg-slate-50 dark:bg-gray-900"><input type="radio" name="exifWeight" value="700" class="hidden"><span class="text-[10px] font-bold">太</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Toggle -->
+                <div class="flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
+                    <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i><span class="text-sm font-bold" style="color: var(--text-main)">日付を自動入力</span></div>
+                    <label class="switch"><input type="checkbox" id="dateToggle" checked><span class="slider"></span></label>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="generateBtn" class="flex-1 bg-white dark:bg-gray-700 border-2 border-slate-800 dark:border-gray-500 hover:bg-slate-800 dark:hover:bg-gray-600 hover:text-white text-slate-800 dark:text-white font-bold py-3 px-4 rounded-xl transition-all text-sm flex items-center justify-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> シンプル生成</button>
+                    <button id="aiGenerateBtn" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] text-sm flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> AI色彩解析</button>
+                </div>
+
+                <!-- Result Section -->
+                <div id="errorBox" class="hidden p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-xl text-sm border-2 border-red-200 dark:border-red-800 font-medium"></div>
+                <div id="resultSection" class="hidden space-y-4">
+                    <div class="flex items-center justify-between px-2 bg-slate-100 dark:bg-gray-800/80 p-3 rounded-2xl border dark:border-gray-700 shadow-inner">
+                        <div class="flex items-center gap-2"><i id="lockIcon" data-lucide="unlock" class="w-4 h-4 text-slate-400 transition-colors"></i><span class="text-xs font-bold" style="color: var(--text-main)">背景色を固定する</span></div>
+                        <label class="switch"><input type="checkbox" id="lockBgToggle"><span class="slider"></span></label>
+                    </div>
+                    <div class="canvas-container bg-black p-1 border-4 border-slate-200 dark:border-gray-700"><canvas id="mainCanvas"></canvas></div>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button id="downloadBtn" class="flex-1 max-w-xs bg-slate-900 dark:bg-indigo-600 hover:bg-black dark:hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full flex items-center justify-center gap-3 transition-all shadow-xl text-lg"><i data-lucide="download" class="w-6 h-6"></i> 保存</button>
+                        <button id="shareBtn" class="flex-1 max-w-xs bg-white dark:bg-gray-800 border-2 border-slate-900 dark:border-indigo-400 text-slate-900 dark:text-indigo-400 font-bold py-4 px-8 rounded-full flex items-center justify-center gap-3 transition-all shadow-xl text-lg"><i data-lucide="share-2" class="w-6 h-6"></i> 共有</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Technical / Disclaimer -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+        <!-- Footer Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-red-600 dark:text-red-400"><i data-lucide="shield-check" class="w-5 h-5"></i> 免責事項</h2>
-                <p class="text-[11px] leading-relaxed text-slate-700 dark:text-gray-300 font-medium">
-                    当サイトの利用により生じた損害やトラブルについて、開発者は一切の責任を負いません。また、AI解析機能は外部サービスを利用しているため、予告なく機能が停止・制限される場合があります。加工した写真の権利関係については、利用者自身の責任で管理してください。
-                </p>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400"><i data-lucide="book-open" class="w-5 h-5"></i> 開発の経緯</h2>
+                <p class="text-sm leading-relaxed font-medium" style="color: var(--text-main)">「撮った写真を手軽に、かつプロっぽくオシャレなフレームで飾りたい！」そんなツールを探していましたが、自分の理想にぴったりのものが無かったため開発しました。作品の演出に役立てば幸いです。</p>
             </div>
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="book-open" class="w-5 h-5 text-green-500"></i> 開発ログ</h2>
-                <div class="space-y-2 text-xs max-h-[100px] overflow-y-auto pr-2" style="color: var(--text-main)">
-                    <div class="flex gap-4"><div class="font-bold text-indigo-600 dark:text-indigo-400 min-w-[50px]">v36.0</div><div class="font-medium">ライトモードのテキスト視認性を強化。</div></div>
-                    <div class="flex gap-4 opacity-70"><div class="font-bold text-indigo-600 dark:text-indigo-400 min-w-[50px]">v35.0</div><div>GitHubリンクの追加。</div></div>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-pink-600 dark:text-pink-400"><i data-lucide="user" class="w-5 h-5"></i> 開発者について</h2>
+                <div class="space-y-4">
+                    <p class="text-[11px] leading-relaxed font-bold" style="color: var(--text-main)">このウェブアプリは、完全無料・広告なしのユーザーファーストな設計です！AI(API)の使用料金も、全額開発者負担です。すっごい頑張って作ったので、もしよかったらいっぱいお金ください！！だってお金欲しいから！！お金くれたら、そのお金でどんなご飯食べたか言います！</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://twitter.com/rinri_nri" target="_blank" class="social-link bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 text-[10px] p-2"><i data-lucide="twitter" class="w-3 h-3"></i> X (Twitter)</a>
+                        <a href="https://note.com/rinri_aho" target="_blank" class="social-link bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] p-2"><i data-lucide="book" class="w-3 h-3"></i> note</a>
+                        <a href="https://github.com/rinri-nri" target="_blank" class="social-link bg-slate-50 dark:bg-slate-900/20 text-slate-600 dark:text-slate-400 text-[10px] p-2"><i data-lucide="github" class="w-3 h-3"></i> GitHub</a>
+                        <a href="https://ko-fi.com/rinrinri" target="_blank" class="social-link bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 text-[10px] p-2"><i data-lucide="coffee" class="w-3 h-3"></i> 寄付 (Ko-fi)</a>
+                    </div>
                 </div>
             </div>
+            <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md col-span-1 md:col-span-2">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-amber-600 dark:text-amber-400"><i data-lucide="layout" class="w-5 h-5"></i> 他のツール・アプリ</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-[10px]">
+                    <div class="p-3 border dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800/50"><strong>AI自動レシピ提案</strong><p class="opacity-70">冷蔵庫からAIが献立を提案。</p></div>
+                    <div class="p-3 border dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800/50"><strong>AI学術サーチ</strong><p class="opacity-70">学びをAIがわかりやすく解説。</p></div>
+                    <div class="p-3 border dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800/50"><strong>算数学習アプリ</strong><p class="opacity-70">現役講師設計の効率学習ツール。</p></div>
+                </div>
+            </div>
+            <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md col-span-1 md:col-span-2 opacity-80">
+                <h2 class="text-sm font-bold mb-2 flex items-center gap-2 text-red-600 dark:text-red-400"><i data-lucide="shield-check" class="w-4 h-4"></i> 免責事項</h2>
+                <p class="text-[11px] leading-relaxed" style="color: var(--text-main)">当サイト利用によるトラブルについて開発者は責任を負いません。加工写真の権利は利用者が管理してください。AI機能は予告なく停止・変更される場合があります。</p>
+            </div>
         </div>
+        <div class="pb-12 text-center font-bold text-slate-400 italic text-[10px]">© 2026 Photo Framer Pro | Developed by @rinri_nri</div>
     </div>
 
     <script type="module">
         const apiKey = "";
-        const imageInput = document.getElementById('imageInput');
-        const iconInput = document.getElementById('iconInput');
-        const customTextInput = document.getElementById('customText');
-        const dateToggle = document.getElementById('dateToggle');
-        const fileNameDisplay = document.getElementById('fileName');
-        const iconFileNameDisplay = document.getElementById('iconFileName');
-        const generateBtn = document.getElementById('generateBtn');
-        const aiGenerateBtn = document.getElementById('aiGenerateBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const shareBtn = document.getElementById('shareBtn');
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const resultSection = document.getElementById('resultSection');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const errorBox = document.getElementById('errorBox');
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIconContainer = document.getElementById('themeIconContainer');
+        const imageInput = document.getElementById('imageInput'), iconInput = document.getElementById('iconInput');
+        const customTextInput = document.getElementById('customText'), paddingRange = document.getElementById('paddingRange'), darknessRange = document.getElementById('darknessRange'), brightnessRange = document.getElementById('brightnessRange');
+        const userTextSizeRange = document.getElementById('userTextSizeRange'), dateToggle = document.getElementById('dateToggle'), lockBgToggle = document.getElementById('lockBgToggle'), exifToggle = document.getElementById('exifToggle');
+        const exifSizeRange = document.getElementById('exifSizeRange'), exifItalicToggle = document.getElementById('exifItalicToggle');
+        const fileNameDisplay = document.getElementById('fileName'), iconFileNameDisplay = document.getElementById('iconFileName');
+        const generateBtn = document.getElementById('generateBtn'), aiGenerateBtn = document.getElementById('aiGenerateBtn'), downloadBtn = document.getElementById('downloadBtn'), shareBtn = document.getElementById('shareBtn');
+        const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const resultSection = document.getElementById('resultSection'), loadingOverlay = document.getElementById('loadingOverlay'), errorBox = document.getElementById('errorBox'), themeToggle = document.getElementById('themeToggle'), themeIconContainer = document.getElementById('themeIconContainer'), lockIcon = document.getElementById('lockIcon');
+
+        let uploadedImage = null, uploadedIcon = null, base64Image = null, lastPalette = null, exifInfo = "";
 
         window.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
-
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
             const isDark = document.body.classList.contains('dark');
-            themeIconContainer.innerHTML = isDark ? 
-                '<i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>' : 
-                '<i data-lucide="moon" class="w-5 h-5 text-slate-600"></i>';
+            themeIconContainer.innerHTML = isDark ? '<i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>' : '<i data-lucide="moon" class="w-5 h-5 text-slate-600"></i>';
+            lucide.createIcons();
+        });
+        lockBgToggle.addEventListener('change', () => {
+            lockIcon.setAttribute('data-lucide', lockBgToggle.checked ? 'lock' : 'unlock');
+            lockIcon.classList.toggle('text-indigo-500', lockBgToggle.checked);
             lucide.createIcons();
         });
 
-        let uploadedImage = null;
-        let uploadedIcon = null;
-        let base64Image = null;
-
-        function showError(msg) {
-            errorBox.textContent = msg; errorBox.classList.remove('hidden');
-            setTimeout(() => errorBox.classList.add('hidden'), 5000);
-        }
+        function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); setTimeout(() => errorBox.classList.add('hidden'), 5000); }
 
         async function fetchWithRetry(url, options, retries = 5) {
             for (let i = 0; i < retries; i++) {
                 try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return await response.json();
-                    if (response.status !== 429 && response.status < 500) break;
+                    const res = await fetch(url, options);
+                    if (res.ok) return await res.json();
+                    if (res.status !== 429 && res.status < 500) break;
                 } catch (e) { if (i === retries - 1) throw e; }
-                await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
+                await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
             }
-            throw new Error("API Connection Failed");
+            throw new Error("API Failed");
         }
 
-        function parseColor(color) {
-            if (!color) return { r: 128, g: 128, b: 128 };
-            if (color.startsWith('rgb')) {
-                const m = color.match(/\d+/g);
-                return m ? { r: parseInt(m[0]), g: parseInt(m[1]), b: parseInt(m[2]) } : { r: 128, g: 128, b: 128 };
-            }
-            const hex = color.replace('#', '');
-            return {
-                r: parseInt(hex.substring(0, 2), 16) || 128,
-                g: parseInt(hex.substring(2, 4), 16) || 128,
-                b: parseInt(hex.substring(4, 6), 16) || 128
-            };
-        }
-
-        function getSelectedFont() {
-            const radio = document.querySelector('input[name="fontFamily"]:checked');
-            return radio ? radio.value : 'Zen Maru Gothic';
+        function parseColor(c) {
+            if (!c) return {r:128,g:128,b:128};
+            if (c.startsWith('rgb')) { const m = c.match(/\d+/g); return m ? {r:parseInt(m[0]),g:parseInt(m[1]),b:parseInt(m[2])} : {r:128,g:128,b:128}; }
+            const h = c.replace('#',''); return {r:parseInt(h.substring(0,2),16),g:parseInt(h.substring(2,4),16),b:parseInt(h.substring(4,6),16)};
         }
 
         imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                fileNameDisplay.textContent = file.name;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => { uploadedImage = img; resultSection.classList.add('hidden'); base64Image = event.target.result.split(',')[1]; };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
+            const f = e.target.files[0];
+            if (f) {
+                fileNameDisplay.textContent = f.name;
+                EXIF.getData(f, function() {
+                    const make = EXIF.getTag(this, "Make") || "", model = EXIF.getTag(this, "Model") || "", fNumber = EXIF.getTag(this, "FNumber"), exposure = EXIF.getTag(this, "ExposureTime"), iso = EXIF.getTag(this, "ISOSpeedRatings"), focal = EXIF.getTag(this, "FocalLength");
+                    let infoParts = [];
+                    if (make || model) infoParts.push(`${make} ${model}`.trim());
+                    if (focal) infoParts.push(`${focal}mm`);
+                    if (fNumber) infoParts.push(`f/${fNumber}`);
+                    if (exposure) { const expVal = exposure < 1 ? `1/${Math.round(1/exposure)}` : exposure; infoParts.push(`${expVal}s`); }
+                    if (iso) infoParts.push(`ISO ${iso}`);
+                    exifInfo = infoParts.join(" | ");
+                });
+                const r = new FileReader();
+                r.onload = (ev) => { const img = new Image(); img.onload = () => { uploadedImage = img; base64Image = ev.target.result.split(',')[1]; }; img.src = ev.target.result; };
+                r.readAsDataURL(f);
             }
         });
 
         iconInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                iconFileNameDisplay.textContent = file.name;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => { uploadedIcon = img; };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
+            const f = e.target.files[0];
+            if (f) {
+                iconFileNameDisplay.textContent = f.name;
+                const r = new FileReader();
+                r.onload = (ev) => { const img = new Image(); img.onload = () => { uploadedIcon = img; }; img.src = ev.target.result; };
+                r.readAsDataURL(f);
             }
         });
 
         function drawFrame(options) {
             if (!uploadedImage) return;
             const { palette } = options;
-            const textValue = customTextInput.value.trim();
-            const selectedFont = getSelectedFont();
-            const maxDim = Math.max(uploadedImage.width, uploadedImage.height);
-            const padding = maxDim * 0.07;
-            const bottomExtra = maxDim * 0.15;
+            lastPalette = palette;
+            const font = document.querySelector('input[name="fontFamily"]:checked')?.value || 'Zen Maru Gothic';
+            const align = document.querySelector('input[name="exifAlign"]:checked')?.value || 'center';
+            const exifW = document.querySelector('input[name="exifWeight"]:checked')?.value || '300';
+            const exifItalic = exifItalicToggle.checked ? 'italic ' : '';
+            const textColType = document.querySelector('input[name="textColor"]:checked')?.value || 'white';
+            let baseColor = textColType === 'black' ? "0, 0, 0" : (textColType === 'gray' ? "128, 128, 128" : "255, 255, 255");
+            const maxD = Math.max(uploadedImage.width, uploadedImage.height), pad = maxD * parseFloat(paddingRange.value);
+            const darkness = parseFloat(darknessRange.value), brightness = parseFloat(brightnessRange.value), extra = maxD * 0.15;
             
-            canvas.width = uploadedImage.width + (padding * 2);
-            canvas.height = uploadedImage.height + padding + bottomExtra;
-
-            ctx.fillStyle = "#050505";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const points = [[0,0],[canvas.width,0],[0,canvas.height],[canvas.width,canvas.height],[canvas.width/2,canvas.height/2]];
-            palette.forEach((color, i) => {
-                const rgb = parseColor(color);
-                const cStr = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-                const grad = ctx.createRadialGradient(points[i][0], points[i][1], 0, points[i][0], points[i][1], canvas.width * 1.3);
-                grad.addColorStop(0, cStr);
-                grad.addColorStop(0.7, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`); 
-                grad.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.globalCompositeOperation = 'screen';
-                ctx.globalAlpha = 0.55;
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas.width = uploadedImage.width + (pad * 2); canvas.height = uploadedImage.height + pad + extra;
+            ctx.fillStyle = "#050505"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const pts = [[0,0],[canvas.width,0],[0,canvas.height],[canvas.width,canvas.height],[canvas.width/2,canvas.height/2]];
+            palette.forEach((c, i) => {
+                const rgb = parseColor(c), g = ctx.createRadialGradient(pts[i][0], pts[i][1], 0, pts[i][0], pts[i][1], canvas.width * 1.3);
+                g.addColorStop(0, `rgb(${rgb.r},${rgb.g},${rgb.b})`); g.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`); g.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.55; ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
             });
-            ctx.globalAlpha = 1.0;
-            ctx.globalCompositeOperation = 'source-over';
-
-            ctx.drawImage(uploadedImage, padding, padding);
-
-            const dotSize = bottomExtra * 0.09;
-            const spacing = (dotSize * 6.5);
-            palette.forEach((color, i) => {
-                ctx.beginPath();
-                ctx.arc(padding + dotSize + (i * spacing), canvas.height - (bottomExtra * 0.65), dotSize, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                ctx.lineWidth = 1.2;
-                ctx.stroke();
-            });
-
-            if (textValue) {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-                ctx.font = `italic 300 ${Math.floor(bottomExtra * 0.18)}px "${selectedFont}", sans-serif`;
-                ctx.textAlign = "left";
-                if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
-                ctx.fillText(textValue, padding, canvas.height - (bottomExtra * 0.22));
+            if (darkness > 0) { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = darkness; ctx.fillStyle = "#000000"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+            if (brightness > 0) { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = brightness; ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+            ctx.globalAlpha = 1.0; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(uploadedImage, pad, pad);
+            const ds = extra * 0.09;
+            palette.forEach((c, i) => { ctx.beginPath(); ctx.arc(pad + ds + (i * ds * 6.5), canvas.height - (extra * 0.65), ds, 0, Math.PI*2); ctx.fillStyle = c; ctx.fill(); });
+            if (customTextInput.value.trim()) {
+                ctx.fillStyle = `rgba(${baseColor}, 0.95)`; ctx.font = `italic 300 ${Math.floor(extra * parseFloat(userTextSizeRange.value))}px "${font}", sans-serif`;
+                ctx.textAlign = "left"; ctx.fillText(customTextInput.value.trim(), pad, canvas.height - (extra*0.22));
             }
-
-            ctx.fillStyle = "rgba(255, 255, 255, 0.30)";
-            ctx.font = `300 ${Math.floor(bottomExtra * 0.10)}px "${selectedFont}", sans-serif`;
-            ctx.textAlign = "left";
-            ctx.fillText('Generated by "Photo Framer Pro" / Developer : @rinri_nri', padding, padding * 0.6);
-
+            ctx.fillStyle = `rgba(${baseColor}, 0.3)`; ctx.font = `300 ${Math.floor(extra*0.1)}px "${font}", sans-serif`;
+            ctx.textAlign = "left"; ctx.fillText('Generated by "Photo Framer Pro" / @rinri_nri', pad, pad * 0.6);
             if (dateToggle.checked) {
-                const now = new Date();
-                const dStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
-                ctx.fillStyle = "rgba(255, 255, 255, 0.60)";
-                ctx.font = `300 ${Math.floor(bottomExtra * 0.14)}px "${selectedFont}", sans-serif`;
-                ctx.textAlign = "right";
-                ctx.fillText(dStr, canvas.width - padding, padding * 0.65);
+                const now = new Date(), d = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+                ctx.fillStyle = `rgba(${baseColor}, 0.6)`; ctx.font = `300 ${Math.floor(extra*0.14)}px "${font}", sans-serif`;
+                ctx.textAlign = "right"; ctx.fillText(d, canvas.width - pad, pad * 0.65);
             }
-
+            if (exifToggle.checked && exifInfo) {
+                ctx.fillStyle = `rgba(${baseColor}, 0.5)`; ctx.font = `${exifItalic}${exifW} ${Math.floor(extra * parseFloat(exifSizeRange.value))}px "${font}", sans-serif`;
+                ctx.textAlign = align; let exifX = align === 'left' ? pad : (align === 'right' ? canvas.width - pad : canvas.width / 2);
+                ctx.fillText(exifInfo, exifX, canvas.height - (extra * 0.1));
+            }
             if (uploadedIcon) {
-                const iR = bottomExtra * 0.25;
-                const iX = canvas.width - padding - (iR * 1.2);
-                const iY = padding + uploadedImage.height + (bottomExtra / 2);
-                ctx.save();
-                ctx.beginPath(); ctx.arc(iX, iY, iR, 0, Math.PI * 2); ctx.clip();
-                const asp = uploadedIcon.width / uploadedIcon.height;
-                let dw, dh, dx, dy;
-                if (asp > 1) { dh = iR * 2; dw = dh * asp; dx = iX - dw / 2; dy = iY - iR; }
-                else { dw = iR * 2; dh = dw / asp; dx = iX - iR; dy = iY - dh / 2; }
-                ctx.drawImage(uploadedIcon, dx, dy, dw, dh);
-                ctx.restore();
-                ctx.beginPath(); ctx.arc(iX, iY, iR, 0, Math.PI * 2);
-                ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 2; ctx.stroke();
+                const ir = extra * 0.25, ix = canvas.width - pad - (ir * 1.2), iy = pad + uploadedImage.height + (extra/2);
+                ctx.save(); ctx.beginPath(); ctx.arc(ix, iy, ir, 0, Math.PI*2); ctx.clip();
+                const a = uploadedIcon.width / uploadedIcon.height; let dw, dh, dx, dy;
+                if (a > 1) { dh = ir*2; dw = dh*a; dx = ix-dw/2; dy = iy-ir; } else { dw = ir*2; dh = dw/a; dx = ix-ir; dy = iy-dh/2; }
+                ctx.drawImage(uploadedIcon, dx, dy, dw, dh); ctx.restore();
             }
+            resultSection.classList.remove('hidden'); resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
 
-            if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
-            resultSection.classList.remove('hidden');
-            resultSection.scrollIntoView({ behavior: 'smooth' });
+        async function runDraw(palette) {
+            const fontName = document.querySelector('input[name="fontFamily"]:checked')?.value || 'Zen Maru Gothic';
+            loadingOverlay.style.display = 'flex';
+            try {
+                await document.fonts.load(`10px "${fontName}"`);
+                drawFrame({ palette });
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
         }
 
         generateBtn.addEventListener('click', () => {
-            if (!uploadedImage) return showError("メイン写真を選択してください。");
-            const tempC = document.createElement('canvas');
-            tempC.width = uploadedImage.width; tempC.height = uploadedImage.height;
-            const tCtx = tempC.getContext('2d');
-            tCtx.drawImage(uploadedImage, 0, 0);
-            const candidates = [];
-            for (let i = 0; i < 50; i++) {
-                const x = Math.floor(Math.random() * tempC.width);
-                const y = Math.floor(Math.random() * tempC.height);
-                const p = tCtx.getImageData(x, y, 1, 1).data;
-                candidates.push(`rgb(${p[0]}, ${p[1]}, ${p[2]})`);
+            if (!uploadedImage) return showError("写真を選択してください。");
+            if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette);
+            const tmp = document.createElement('canvas'); tmp.width = uploadedImage.width; tmp.height = uploadedImage.height;
+            const tctx = tmp.getContext('2d'); tctx.drawImage(uploadedImage, 0, 0);
+            const pal = [];
+            for (let i = 0; i < 5; i++) {
+                const p = tctx.getImageData(Math.random()*tmp.width, Math.random()*tmp.height, 1, 1).data;
+                pal.push(`rgb(${p[0]},${p[1]},${p[2]})`);
             }
-            drawFrame({ palette: candidates.slice(0, 5) });
+            runDraw(pal);
         });
 
         aiGenerateBtn.addEventListener('click', async () => {
-            if (!uploadedImage || !base64Image) return showError("メイン写真を選択してください。");
+            if (!uploadedImage || !base64Image) return showError("写真を選択してください。");
+            if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette);
             loadingOverlay.style.display = 'flex';
             try {
-                const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            role: "user",
-                            parts: [
-                                { text: "画像から分散した代表的な5色をJSON形式で返してください。 { \"palette\": [\"#hex1\", \"#hex2\", \"#hex3\", \"#hex4\", \"#hex5\"] }" },
-                                { inlineData: { mimeType: "image/png", data: base64Image } }
-                            ]
-                        }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
+                const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "画像から分散した代表的な5色をJSON形式で返してください。 { \"palette\": [\"#hex1\", \"#hex2\", \"#hex3\", \"#hex4\", \"#hex5\"] }" }, { inlineData: { mimeType: "image/png", data: base64Image } }] }], generationConfig: { responseMimeType: "application/json" } })
                 });
-                const data = JSON.parse(response.candidates[0].content.parts[0].text);
-                drawFrame({ palette: data.palette });
-            } catch (err) { showError("AI解析エラー。API制限の可能性があります。"); } finally { loadingOverlay.style.display = 'none'; }
+                const data = JSON.parse(res.candidates[0].content.parts[0].text);
+                runDraw(data.palette);
+            } catch (err) { showError("AI解析エラー。"); } finally { loadingOverlay.style.display = 'none'; }
         });
 
         downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = `photo_frame_v36.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            canvas.toBlob((b) => {
+                const u = URL.createObjectURL(b), a = document.createElement('a');
+                a.download = `PhotoFramerPro_${Date.now()}.png`; a.href = u; a.click();
+                setTimeout(() => URL.revokeObjectURL(u), 100);
+            }, 'image/png');
         });
 
-        shareBtn.addEventListener('click', async () => {
-            try {
-                canvas.toBlob(async (blob) => {
-                    if (!blob) return showError("共有用データの作成に失敗しました。");
-                    const file = new File([blob], "shared_photo.png", { type: "image/png" });
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: 'Photo Framer Pro 作品',
-                            text: 'オシャレなフレームで写真を加工しました！ developed by @rinri_nri #PhotoFramer'
-                        });
-                    } else {
-                        showError("このブラウザは直接共有をサポートしていません。画像を保存して投稿してください。");
-                    }
-                }, "image/png");
-            } catch (err) {
-                showError("共有中にエラーが発生しました。");
-            }
+        shareBtn.addEventListener('click', () => {
+            canvas.toBlob(async (b) => {
+                const f = new File([b], "photo.png", { type: "image/png" });
+                if (navigator.canShare && navigator.canShare({ files: [f] })) {
+                    await navigator.share({ files: [f], title: 'Photo Framer Pro', text: 'developed by @rinri_nri #PhotoFramer' });
+                } else { showError("共有未対応です。"); }
+            }, 'image/png');
         });
     </script>
 </body>
