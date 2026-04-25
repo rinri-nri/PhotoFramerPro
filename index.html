@@ -3,140 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Framer & AI Mesh Gradient v50.0</title>
+    <title>Photo Framer & AI Mesh Gradient v52.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- EXIF Library -->
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
-    <!-- Google Fonts (COMPLETE 34 TYPES) -->
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;700&family=Noto+Sans+JP:wght@300&family=Noto+Serif+JP:wght@300&family=Cormorant+Garamond:ital,wght@1,300;1,700&family=Rubik+Scribble&family=Playfair+Display:ital,wght@1,700&family=M+PLUS+Rounded+1c:wght@300&family=Kiwi+Maru:wght@300&family=Shippori+Mincho&family=Yuji+Syuku&family=Montserrat:wght@300&family=Oswald:wght@300&family=Lora:ital,wght@1,400&family=Kaisei+Opti&family=Caveat&family=Satisfy&family=RocknRoll+One&family=DotGothic16&family=Dela+Gothic+One&family=Hachi+Maru+Pop&family=Potta+One&family=BIZ+UDPGothic:wght@400;700&family=Pacifico&family=Lobster&family=Cinzel:wght@400;700&family=Righteous&family=Abril+Fatface&family=Sacramento&family=Permanent+Marker&family=Kurenaido&family=Bangers&family=Fredoka+One&family=Monoton&family=Rubik+Puddles&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-page: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --border-ui: #cbd5e1;
-        }
-
-        .dark {
-            --bg-page: #111827;
-            --bg-card: #1f2937;
-            --text-main: #f3f4f6;
-            --border-ui: #374151;
-        }
-
-        body {
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            font-family: 'Zen Maru Gothic', sans-serif;
-            font-weight: 300;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .card {
-            background-color: var(--bg-card);
-            transition: background-color 0.3s ease;
-        }
-
-        .canvas-container {
-            max-width: 100%;
-            overflow: auto;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
-        }
-
-        canvas {
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            height: auto !important;
-        }
-
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(17, 24, 39, 0.85);
-            z-index: 50;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border-left-color: #6366f1;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
+        :root { --bg-page: #f8fafc; --bg-card: #ffffff; --text-main: #0f172a; --border-ui: #cbd5e1; }
+        .dark { --bg-page: #111827; --bg-card: #1f2937; --text-main: #f3f4f6; --border-ui: #374151; }
+        body { background-color: var(--bg-page); color: var(--text-main); font-family: 'Zen Maru Gothic', sans-serif; font-weight: 300; transition: background-color 0.3s ease, color 0.3s ease; }
+        .card { background-color: var(--bg-card); transition: background-color 0.3s ease; }
+        .canvas-container { max-width: 100%; overflow: auto; border-radius: 12px; box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6); }
+        canvas { display: block; margin: 0 auto; max-width: 100%; height: auto !important; }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.85); z-index: 50; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: #6366f1; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #94a3b8;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #94a3b8; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #6366f1; }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        .font-option {
-            transition: all 0.2s;
-            cursor: pointer;
-        }
+        .font-option { transition: all 0.2s; cursor: pointer; }
         .font-option:hover { background-color: rgba(99, 102, 241, 0.1); }
-        input[name="fontFamily"]:checked + span,
-        input[name="textColor"]:checked + span,
-        input[name="exifAlign"]:checked + span,
-        input[name="exifWeight"]:checked + span {
-            color: #6366f1;
-            font-weight: 700;
-        }
-
-        .social-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
+        input[name="fontFamily"]:checked + span, input[name="textColor"]:checked + span, input[name="exifAlign"]:checked + span, input[name="exifWeight"]:checked + span { color: #6366f1; font-weight: 700; }
+        .social-link { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
-            background: #6366f1; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-        }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #6366f1; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #e2e8f0; border-radius: 4px; }
         .dark input[type=range]::-webkit-slider-runnable-track { background: #374151; }
     </style>
@@ -147,20 +40,16 @@
         <p class="text-indigo-500 font-bold animate-pulse text-lg">色彩と書体をロード中...</p>
     </div>
 
-    <!-- Theme Toggle -->
     <div class="max-w-4xl mx-auto flex justify-end mb-4">
         <button id="themeToggle" class="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800 shadow-md border dark:border-gray-600">
-            <div id="themeIconContainer">
-                <i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>
-            </div>
+            <div id="themeIconContainer"><i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i></div>
         </button>
     </div>
 
     <div class="max-w-4xl mx-auto space-y-6 mb-8">
         <div class="card p-6 rounded-3xl shadow-2xl border dark:border-gray-700">
             <h1 class="text-2xl font-bold mb-6 flex items-center gap-3" style="color: var(--text-main)">
-                <i data-lucide="palette" class="w-7 h-7 text-indigo-500"></i>
-                Photo Framer Pro
+                <i data-lucide="palette" class="w-7 h-7 text-indigo-500"></i> Photo Framer Pro
             </h1>
 
             <div class="space-y-6">
@@ -184,35 +73,25 @@
                     </div>
                 </div>
 
-                <!-- Text Input & Size Slider -->
                 <div class="space-y-4">
                     <div>
-                        <label for="customText" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
-                            <i data-lucide="type" class="w-4 h-4 text-indigo-500"></i> 左下に表示する文章
-                        </label>
+                        <label for="customText" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="type" class="w-4 h-4 text-indigo-500"></i> 左下に表示する文章</label>
                         <input type="text" id="customText" placeholder="例: Timeless Moments" class="w-full p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition-all bg-transparent text-lg font-light italic" style="color: var(--text-main)">
                     </div>
                     <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
-                        <label for="userTextSizeRange" class="block text-xs font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
-                            <i data-lucide="maximize" class="w-3 h-3 text-indigo-500"></i> テキストのサイズ
-                        </label>
+                        <label for="userTextSizeRange" class="block text-xs font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="maximize" class="w-3 h-3 text-indigo-500"></i> テキストのサイズ</label>
                         <input type="range" id="userTextSizeRange" min="0.05" max="0.30" step="0.01" value="0.18" class="w-full">
                     </div>
                 </div>
 
-                <!-- Settings Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-4">
                         <details class="group border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30 overflow-hidden">
                             <summary class="flex items-center justify-between p-3 cursor-pointer list-none select-none">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="case-sensitive" class="w-4 h-4 text-indigo-500"></i>
-                                    <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">フォント・コレクション (34種)</span>
-                                </div>
+                                <div class="flex items-center gap-2"><i data-lucide="case-sensitive" class="w-4 h-4 text-indigo-500"></i><span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">フォント・コレクション (34種)</span></div>
                                 <i data-lucide="chevron-down" class="w-4 h-4 opacity-50 group-open:rotate-180 transition-transform"></i>
                             </summary>
                             <div class="p-4 border-t dark:border-gray-600 grid grid-cols-1 gap-2 bg-white dark:bg-gray-900/50 max-h-[250px] overflow-y-auto">
-                                <!-- Japanese Fonts (15) -->
                                 <div class="text-[10px] font-bold text-indigo-500 mt-2">JAPANESE</div>
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Zen Maru Gothic" checked class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Zen Maru Gothic';">Zen Maru Gothic</span></label>
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Shippori Mincho" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Shippori Mincho';">しっぽり明朝</span></label>
@@ -229,7 +108,6 @@
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="DotGothic16" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'DotGothic16';">ドットゴシック</span></label>
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Kurenaido" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Kurenaido';">クレナイド</span></label>
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="M PLUS Rounded 1c" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'M PLUS Rounded 1c';">M PLUS Rounded</span></label>
-                                <!-- English Fonts (19) -->
                                 <div class="text-[10px] font-bold text-indigo-500 mt-4">ENGLISH</div>
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Cinzel" class="w-3 h-3 accent-indigo-500"><span class="text-xs" style="font-family: 'Cinzel';">CINZEL</span></label>
                                 <label class="font-option flex items-center gap-2 p-1.5 rounded-lg border dark:border-gray-700"><input type="radio" name="fontFamily" value="Cormorant Garamond" class="w-3 h-3 accent-indigo-500"><span class="text-xs italic" style="font-family: 'Cormorant Garamond';">Garamond</span></label>
@@ -253,11 +131,8 @@
                             </div>
                         </details>
 
-                        <!-- TEXT COLOR SELECTOR -->
                         <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
-                            <label class="block text-sm font-bold mb-3 flex items-center gap-2" style="color: var(--text-main)">
-                                <i data-lucide="palette" class="w-4 h-4 text-indigo-500"></i> テキストのカラー
-                            </label>
+                            <label class="block text-sm font-bold mb-3 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="palette" class="w-4 h-4 text-indigo-500"></i> テキストのカラー</label>
                             <div class="flex gap-2">
                                 <label class="flex-1 font-option flex items-center justify-center gap-2 p-2 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800"><input type="radio" name="textColor" value="white" checked class="w-3 h-3 accent-indigo-500"><span class="text-[10px] font-bold">白</span></label>
                                 <label class="flex-1 font-option flex items-center justify-center gap-2 p-2 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800"><input type="radio" name="textColor" value="black" class="w-3 h-3 accent-indigo-500"><span class="text-[10px] font-bold">黒</span></label>
@@ -266,12 +141,9 @@
                         </div>
                     </div>
 
-                    <!-- Sliders -->
                     <div class="space-y-4">
                         <div class="p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
-                            <label for="paddingRange" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)">
-                                <i data-lucide="frame" class="w-4 h-4 text-indigo-500"></i> 外枠の太さ
-                            </label>
+                            <label for="paddingRange" class="block text-sm font-bold mb-2 flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="frame" class="w-4 h-4 text-indigo-500"></i> 外枠の太さ</label>
                             <input type="range" id="paddingRange" min="0.01" max="0.20" step="0.01" value="0.07" class="w-full">
                         </div>
                         <div class="grid grid-cols-2 gap-2">
@@ -287,7 +159,6 @@
                     </div>
                 </div>
 
-                <!-- EXIF Settings -->
                 <div class="p-4 border-2 border-slate-200 dark:border-gray-600 rounded-2xl bg-slate-50 dark:bg-gray-800/20 space-y-4">
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1 flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
@@ -306,7 +177,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-3 p-3 border-2 border-slate-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
                             <div class="flex items-center justify-between">
-                                <label for="exifSizeRange" class="text-xs font-bold flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="text-cursor-input" class="w-3 h-3 text-indigo-500"></i> 文字サイズ</label>
+                                <label for="exifSizeRange" class="text-xs font-bold flex items-center gap-2" style="color: var(--text-main)"><i data-lucide="text-cursor-input" class="w-3 h-3 text-indigo-500"></i> EXIF文字サイズ</label>
                                 <div class="flex items-center gap-2"><span class="text-[10px] opacity-70">斜体</span><label class="switch scale-75"><input type="checkbox" id="exifItalicToggle"><span class="slider"></span></label></div>
                             </div>
                             <input type="range" id="exifSizeRange" min="0.04" max="0.15" step="0.005" value="0.09" class="w-full">
@@ -322,10 +193,15 @@
                     </div>
                 </div>
 
-                <!-- Date Toggle -->
-                <div class="flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
-                    <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i><span class="text-sm font-bold" style="color: var(--text-main)">日付を自動入力</span></div>
-                    <label class="switch"><input type="checkbox" id="dateToggle" checked><span class="slider"></span></label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
+                        <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i><span class="text-sm font-bold" style="color: var(--text-main)">日付を自動入力</span></div>
+                        <label class="switch"><input type="checkbox" id="dateToggle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="flex items-center justify-between p-3 border-2 border-slate-200 dark:border-gray-600 rounded-xl bg-slate-50 dark:bg-gray-800/30">
+                        <div class="flex items-center gap-2"><i data-lucide="circle-dot" class="w-4 h-4 text-indigo-500"></i><span class="text-sm font-bold" style="color: var(--text-main)">パレットを表示</span></div>
+                        <label class="switch"><input type="checkbox" id="paletteToggle" checked><span class="slider"></span></label>
+                    </div>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -333,7 +209,6 @@
                     <button id="aiGenerateBtn" class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] text-sm flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> AI色彩解析</button>
                 </div>
 
-                <!-- Result Section -->
                 <div id="errorBox" class="hidden p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-xl text-sm border-2 border-red-200 dark:border-red-800 font-medium"></div>
                 <div id="resultSection" class="hidden space-y-4">
                     <div class="flex items-center justify-between px-2 bg-slate-100 dark:bg-gray-800/80 p-3 rounded-2xl border dark:border-gray-700 shadow-inner">
@@ -349,11 +224,10 @@
             </div>
         </div>
 
-        <!-- Footer Info Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md">
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400"><i data-lucide="book-open" class="w-5 h-5"></i> 開発の経緯</h2>
-                <p class="text-sm leading-relaxed font-medium" style="color: var(--text-main)">「撮った写真を手軽に、かつプロっぽくオシャレなフレームで飾りたい！」そんなツールを探していましたが、自分の理想にぴったりのものが無かったため開発しました。作品の演出に役立てば幸いです。</p>
+                <p class="text-sm leading-relaxed font-medium" style="color: var(--text-main)">「自分の理想にぴったりのツールが無いなら作ろう！」という想いから、34種類の豊富なフォント選びや、外枠の絶妙な太さ調整、暗さ・明るさによる雰囲気作り、そして文字色やサイズの微細なコントロールまで徹底的にこだわりました。特にカメラ好きとして、写真のメタデータ（EXIF情報）を自在に配置・加工できる機能は妥協せず実装しています。</p>
             </div>
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md">
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-pink-600 dark:text-pink-400"><i data-lucide="user" class="w-5 h-5"></i> 開発者について</h2>
@@ -375,6 +249,22 @@
                     <div class="p-3 border dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800/50"><strong>算数学習アプリ</strong><p class="opacity-70">現役講師設計の効率学習ツール。</p></div>
                 </div>
             </div>
+            <!-- VERSION HISTORY (Added v52.0) -->
+            <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md col-span-1 md:col-span-2">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-600 dark:text-blue-400"><i data-lucide="history" class="w-5 h-5"></i> アップデート履歴</h2>
+                <div class="space-y-2 text-[10px] max-h-[150px] overflow-y-auto pr-2">
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v52.0</strong><p>アップデート履歴カードを設置。開発ログを一元化。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v51.0</strong><p>パレット（丸）表示ON/OFF、開発経緯のこだわり追記。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v50.0</strong><p>開発者メッセージを「ご飯情熱」版へ更新、リンク整備。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v49.0</strong><p>フォントコレクション内の全名前に実書体プレビューを適用。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v48.0</strong><p>フォント変更が反映されない不具合をロード待機処理で修正。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v47.0</strong><p>プロフィールカード・制作物紹介・フォント34種への拡張。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v46.0</strong><p>ユーザーテキストのフォントサイズ調整スライダーを追加。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v45.0</strong><p>EXIF文字のサイズ・太さ・斜体等の詳細微調整機能を実装。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v44.0</strong><p>EXIF自動抽出機能および配置（左・中・右）機能を追加。</p></div>
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v42.0</strong><p>テキストカラー（白・黒・灰）の一括変更ボタンを設置。</p></div>
+                </div>
+            </div>
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md col-span-1 md:col-span-2 opacity-80">
                 <h2 class="text-sm font-bold mb-2 flex items-center gap-2 text-red-600 dark:text-red-400"><i data-lucide="shield-check" class="w-4 h-4"></i> 免責事項</h2>
                 <p class="text-[11px] leading-relaxed" style="color: var(--text-main)">当サイト利用によるトラブルについて開発者は責任を負いません。加工写真の権利は利用者が管理してください。AI機能は予告なく停止・変更される場合があります。</p>
@@ -385,49 +275,15 @@
 
     <script type="module">
         const apiKey = "";
-        const imageInput = document.getElementById('imageInput'), iconInput = document.getElementById('iconInput');
-        const customTextInput = document.getElementById('customText'), paddingRange = document.getElementById('paddingRange'), darknessRange = document.getElementById('darknessRange'), brightnessRange = document.getElementById('brightnessRange');
-        const userTextSizeRange = document.getElementById('userTextSizeRange'), dateToggle = document.getElementById('dateToggle'), lockBgToggle = document.getElementById('lockBgToggle'), exifToggle = document.getElementById('exifToggle');
-        const exifSizeRange = document.getElementById('exifSizeRange'), exifItalicToggle = document.getElementById('exifItalicToggle');
-        const fileNameDisplay = document.getElementById('fileName'), iconFileNameDisplay = document.getElementById('iconFileName');
-        const generateBtn = document.getElementById('generateBtn'), aiGenerateBtn = document.getElementById('aiGenerateBtn'), downloadBtn = document.getElementById('downloadBtn'), shareBtn = document.getElementById('shareBtn');
-        const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const resultSection = document.getElementById('resultSection'), loadingOverlay = document.getElementById('loadingOverlay'), errorBox = document.getElementById('errorBox'), themeToggle = document.getElementById('themeToggle'), themeIconContainer = document.getElementById('themeIconContainer'), lockIcon = document.getElementById('lockIcon');
-
+        const imageInput = document.getElementById('imageInput'), iconInput = document.getElementById('iconInput'), customTextInput = document.getElementById('customText'), paddingRange = document.getElementById('paddingRange'), darknessRange = document.getElementById('darknessRange'), brightnessRange = document.getElementById('brightnessRange'), userTextSizeRange = document.getElementById('userTextSizeRange'), dateToggle = document.getElementById('dateToggle'), lockBgToggle = document.getElementById('lockBgToggle'), exifToggle = document.getElementById('exifToggle'), paletteToggle = document.getElementById('paletteToggle'), exifSizeRange = document.getElementById('exifSizeRange'), exifItalicToggle = document.getElementById('exifItalicToggle'), fileNameDisplay = document.getElementById('fileName'), iconFileNameDisplay = document.getElementById('iconFileName'), generateBtn = document.getElementById('generateBtn'), aiGenerateBtn = document.getElementById('aiGenerateBtn'), downloadBtn = document.getElementById('downloadBtn'), shareBtn = document.getElementById('shareBtn'), canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d', { willReadFrequently: true }), resultSection = document.getElementById('resultSection'), loadingOverlay = document.getElementById('loadingOverlay'), errorBox = document.getElementById('errorBox'), themeToggle = document.getElementById('themeToggle'), themeIconContainer = document.getElementById('themeIconContainer'), lockIcon = document.getElementById('lockIcon');
         let uploadedImage = null, uploadedIcon = null, base64Image = null, lastPalette = null, exifInfo = "";
 
         window.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
-            themeIconContainer.innerHTML = isDark ? '<i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>' : '<i data-lucide="moon" class="w-5 h-5 text-slate-600"></i>';
-            lucide.createIcons();
-        });
-        lockBgToggle.addEventListener('change', () => {
-            lockIcon.setAttribute('data-lucide', lockBgToggle.checked ? 'lock' : 'unlock');
-            lockIcon.classList.toggle('text-indigo-500', lockBgToggle.checked);
-            lucide.createIcons();
-        });
-
+        themeToggle.addEventListener('click', () => { document.body.classList.toggle('dark'); const isDark = document.body.classList.contains('dark'); themeIconContainer.innerHTML = isDark ? '<i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>' : '<i data-lucide="moon" class="w-5 h-5 text-slate-600"></i>'; lucide.createIcons(); });
+        lockBgToggle.addEventListener('change', () => { lockIcon.setAttribute('data-lucide', lockBgToggle.checked ? 'lock' : 'unlock'); lockIcon.classList.toggle('text-indigo-500', lockBgToggle.checked); lucide.createIcons(); });
         function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); setTimeout(() => errorBox.classList.add('hidden'), 5000); }
-
-        async function fetchWithRetry(url, options, retries = 5) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch(url, options);
-                    if (res.ok) return await res.json();
-                    if (res.status !== 429 && res.status < 500) break;
-                } catch (e) { if (i === retries - 1) throw e; }
-                await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
-            }
-            throw new Error("API Failed");
-        }
-
-        function parseColor(c) {
-            if (!c) return {r:128,g:128,b:128};
-            if (c.startsWith('rgb')) { const m = c.match(/\d+/g); return m ? {r:parseInt(m[0]),g:parseInt(m[1]),b:parseInt(m[2])} : {r:128,g:128,b:128}; }
-            const h = c.replace('#',''); return {r:parseInt(h.substring(0,2),16),g:parseInt(h.substring(2,4),16),b:parseInt(h.substring(4,6),16)};
-        }
+        async function fetchWithRetry(url, options, retries = 5) { for (let i = 0; i < retries; i++) { try { const res = await fetch(url, options); if (res.ok) return await res.json(); if (res.status !== 429 && res.status < 500) break; } catch (e) { if (i === retries - 1) throw e; } await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000)); } throw new Error("API Failed"); }
+        function parseColor(c) { if (!c) return {r:128,g:128,b:128}; if (c.startsWith('rgb')) { const m = c.match(/\d+/g); return m ? {r:parseInt(m[0]),g:parseInt(m[1]),b:parseInt(m[2])} : {r:128,g:128,b:128}; } const h = c.replace('#',''); return {r:parseInt(h.substring(0,2),16),g:parseInt(h.substring(2,4),16),b:parseInt(h.substring(4,6),16)}; }
 
         imageInput.addEventListener('change', (e) => {
             const f = e.target.files[0];
@@ -435,136 +291,39 @@
                 fileNameDisplay.textContent = f.name;
                 EXIF.getData(f, function() {
                     const make = EXIF.getTag(this, "Make") || "", model = EXIF.getTag(this, "Model") || "", fNumber = EXIF.getTag(this, "FNumber"), exposure = EXIF.getTag(this, "ExposureTime"), iso = EXIF.getTag(this, "ISOSpeedRatings"), focal = EXIF.getTag(this, "FocalLength");
-                    let infoParts = [];
-                    if (make || model) infoParts.push(`${make} ${model}`.trim());
-                    if (focal) infoParts.push(`${focal}mm`);
-                    if (fNumber) infoParts.push(`f/${fNumber}`);
-                    if (exposure) { const expVal = exposure < 1 ? `1/${Math.round(1/exposure)}` : exposure; infoParts.push(`${expVal}s`); }
-                    if (iso) infoParts.push(`ISO ${iso}`);
-                    exifInfo = infoParts.join(" | ");
+                    let infoParts = []; if (make || model) infoParts.push(`${make} ${model}`.trim()); if (focal) infoParts.push(`${focal}mm`); if (fNumber) infoParts.push(`f/${fNumber}`); if (exposure) { const expVal = exposure < 1 ? `1/${Math.round(1/exposure)}` : exposure; infoParts.push(`${expVal}s`); } if (iso) infoParts.push(`ISO ${iso}`); exifInfo = infoParts.join(" | ");
                 });
-                const r = new FileReader();
-                r.onload = (ev) => { const img = new Image(); img.onload = () => { uploadedImage = img; base64Image = ev.target.result.split(',')[1]; }; img.src = ev.target.result; };
-                r.readAsDataURL(f);
+                const r = new FileReader(); r.onload = (ev) => { const img = new Image(); img.onload = () => { uploadedImage = img; base64Image = ev.target.result.split(',')[1]; }; img.src = ev.target.result; }; r.readAsDataURL(f);
             }
         });
-
-        iconInput.addEventListener('change', (e) => {
-            const f = e.target.files[0];
-            if (f) {
-                iconFileNameDisplay.textContent = f.name;
-                const r = new FileReader();
-                r.onload = (ev) => { const img = new Image(); img.onload = () => { uploadedIcon = img; }; img.src = ev.target.result; };
-                r.readAsDataURL(f);
-            }
-        });
+        iconInput.addEventListener('change', (e) => { const f = e.target.files[0]; if (f) { iconFileNameDisplay.textContent = f.name; const r = new FileReader(); r.onload = (ev) => { const img = new Image(); img.onload = () => { uploadedIcon = img; }; img.src = ev.target.result; }; r.readAsDataURL(f); } });
 
         function drawFrame(options) {
             if (!uploadedImage) return;
-            const { palette } = options;
-            lastPalette = palette;
-            const font = document.querySelector('input[name="fontFamily"]:checked')?.value || 'Zen Maru Gothic';
-            const align = document.querySelector('input[name="exifAlign"]:checked')?.value || 'center';
-            const exifW = document.querySelector('input[name="exifWeight"]:checked')?.value || '300';
-            const exifItalic = exifItalicToggle.checked ? 'italic ' : '';
-            const textColType = document.querySelector('input[name="textColor"]:checked')?.value || 'white';
+            const { palette } = options; lastPalette = palette;
+            const font = document.querySelector('input[name="fontFamily"]:checked')?.value || 'Zen Maru Gothic', align = document.querySelector('input[name="exifAlign"]:checked')?.value || 'center', exifW = document.querySelector('input[name="exifWeight"]:checked')?.value || '300', exifItalic = exifItalicToggle.checked ? 'italic ' : '', textColType = document.querySelector('input[name="textColor"]:checked')?.value || 'white';
             let baseColor = textColType === 'black' ? "0, 0, 0" : (textColType === 'gray' ? "128, 128, 128" : "255, 255, 255");
-            const maxD = Math.max(uploadedImage.width, uploadedImage.height), pad = maxD * parseFloat(paddingRange.value);
-            const darkness = parseFloat(darknessRange.value), brightness = parseFloat(brightnessRange.value), extra = maxD * 0.15;
-            
+            const maxD = Math.max(uploadedImage.width, uploadedImage.height), pad = maxD * parseFloat(paddingRange.value), darkness = parseFloat(darknessRange.value), brightness = parseFloat(brightnessRange.value), extra = maxD * 0.15;
             canvas.width = uploadedImage.width + (pad * 2); canvas.height = uploadedImage.height + pad + extra;
             ctx.fillStyle = "#050505"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             const pts = [[0,0],[canvas.width,0],[0,canvas.height],[canvas.width,canvas.height],[canvas.width/2,canvas.height/2]];
-            palette.forEach((c, i) => {
-                const rgb = parseColor(c), g = ctx.createRadialGradient(pts[i][0], pts[i][1], 0, pts[i][0], pts[i][1], canvas.width * 1.3);
-                g.addColorStop(0, `rgb(${rgb.r},${rgb.g},${rgb.b})`); g.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`); g.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.55; ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
-            });
+            palette.forEach((c, i) => { const rgb = parseColor(c), g = ctx.createRadialGradient(pts[i][0], pts[i][1], 0, pts[i][0], pts[i][1], canvas.width * 1.3); g.addColorStop(0, `rgb(${rgb.r},${rgb.g},${rgb.b})`); g.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.55; ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height); });
             if (darkness > 0) { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = darkness; ctx.fillStyle = "#000000"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
             if (brightness > 0) { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = brightness; ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
             ctx.globalAlpha = 1.0; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(uploadedImage, pad, pad);
-            const ds = extra * 0.09;
-            palette.forEach((c, i) => { ctx.beginPath(); ctx.arc(pad + ds + (i * ds * 6.5), canvas.height - (extra * 0.65), ds, 0, Math.PI*2); ctx.fillStyle = c; ctx.fill(); });
-            if (customTextInput.value.trim()) {
-                ctx.fillStyle = `rgba(${baseColor}, 0.95)`; ctx.font = `italic 300 ${Math.floor(extra * parseFloat(userTextSizeRange.value))}px "${font}", sans-serif`;
-                ctx.textAlign = "left"; ctx.fillText(customTextInput.value.trim(), pad, canvas.height - (extra*0.22));
-            }
-            ctx.fillStyle = `rgba(${baseColor}, 0.3)`; ctx.font = `300 ${Math.floor(extra*0.1)}px "${font}", sans-serif`;
-            ctx.textAlign = "left"; ctx.fillText('Generated by "Photo Framer Pro" / @rinri_nri', pad, pad * 0.6);
-            if (dateToggle.checked) {
-                const now = new Date(), d = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
-                ctx.fillStyle = `rgba(${baseColor}, 0.6)`; ctx.font = `300 ${Math.floor(extra*0.14)}px "${font}", sans-serif`;
-                ctx.textAlign = "right"; ctx.fillText(d, canvas.width - pad, pad * 0.65);
-            }
-            if (exifToggle.checked && exifInfo) {
-                ctx.fillStyle = `rgba(${baseColor}, 0.5)`; ctx.font = `${exifItalic}${exifW} ${Math.floor(extra * parseFloat(exifSizeRange.value))}px "${font}", sans-serif`;
-                ctx.textAlign = align; let exifX = align === 'left' ? pad : (align === 'right' ? canvas.width - pad : canvas.width / 2);
-                ctx.fillText(exifInfo, exifX, canvas.height - (extra * 0.1));
-            }
-            if (uploadedIcon) {
-                const ir = extra * 0.25, ix = canvas.width - pad - (ir * 1.2), iy = pad + uploadedImage.height + (extra/2);
-                ctx.save(); ctx.beginPath(); ctx.arc(ix, iy, ir, 0, Math.PI*2); ctx.clip();
-                const a = uploadedIcon.width / uploadedIcon.height; let dw, dh, dx, dy;
-                if (a > 1) { dh = ir*2; dw = dh*a; dx = ix-dw/2; dy = iy-ir; } else { dw = ir*2; dh = dw/a; dx = ix-ir; dy = iy-dh/2; }
-                ctx.drawImage(uploadedIcon, dx, dy, dw, dh); ctx.restore();
-            }
+            if (paletteToggle.checked) { const ds = extra * 0.09; palette.forEach((c, i) => { ctx.beginPath(); ctx.arc(pad + ds + (i * ds * 6.5), canvas.height - (extra * 0.65), ds, 0, Math.PI*2); ctx.fillStyle = c; ctx.fill(); }); }
+            if (customTextInput.value.trim()) { ctx.fillStyle = `rgba(${baseColor}, 0.95)`; ctx.font = `italic 300 ${Math.floor(extra * parseFloat(userTextSizeRange.value))}px "${font}", sans-serif`; ctx.textAlign = "left"; ctx.fillText(customTextInput.value.trim(), pad, canvas.height - (extra*0.22)); }
+            ctx.fillStyle = `rgba(${baseColor}, 0.3)`; ctx.font = `300 ${Math.floor(extra*0.1)}px "${font}", sans-serif`; ctx.textAlign = "left"; ctx.fillText('Generated by "Photo Framer Pro" / @rinri_nri', pad, pad * 0.6);
+            if (dateToggle.checked) { const now = new Date(), d = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`; ctx.fillStyle = `rgba(${baseColor}, 0.6)`; ctx.font = `300 ${Math.floor(extra*0.14)}px "${font}", sans-serif`; ctx.textAlign = "right"; ctx.fillText(d, canvas.width - pad, pad * 0.65); }
+            if (exifToggle.checked && exifInfo) { ctx.fillStyle = `rgba(${baseColor}, 0.5)`; ctx.font = `${exifItalic}${exifW} ${Math.floor(extra * parseFloat(exifSizeRange.value))}px "${font}", sans-serif`; ctx.textAlign = align; let exifX = align === 'left' ? pad : (align === 'right' ? canvas.width - pad : canvas.width / 2); ctx.fillText(exifInfo, exifX, canvas.height - (extra * 0.1)); }
+            if (uploadedIcon) { const ir = extra * 0.25, ix = canvas.width - pad - (ir * 1.2), iy = pad + uploadedImage.height + (extra/2); ctx.save(); ctx.beginPath(); ctx.arc(ix, iy, ir, 0, Math.PI*2); ctx.clip(); const a = uploadedIcon.width / uploadedIcon.height; let dw, dh, dx, dy; if (a > 1) { dh = ir*2; dw = dh*a; dx = ix-dw/2; dy = iy-ir; } else { dw = ir*2; dh = dw/a; dx = ix-ir; dy = iy-dh/2; } ctx.drawImage(uploadedIcon, dx, dy, dw, dh); ctx.restore(); }
             resultSection.classList.remove('hidden'); resultSection.scrollIntoView({ behavior: 'smooth' });
         }
-
-        async function runDraw(palette) {
-            const fontName = document.querySelector('input[name="fontFamily"]:checked')?.value || 'Zen Maru Gothic';
-            loadingOverlay.style.display = 'flex';
-            try {
-                await document.fonts.load(`10px "${fontName}"`);
-                drawFrame({ palette });
-            } finally {
-                loadingOverlay.style.display = 'none';
-            }
-        }
-
-        generateBtn.addEventListener('click', () => {
-            if (!uploadedImage) return showError("写真を選択してください。");
-            if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette);
-            const tmp = document.createElement('canvas'); tmp.width = uploadedImage.width; tmp.height = uploadedImage.height;
-            const tctx = tmp.getContext('2d'); tctx.drawImage(uploadedImage, 0, 0);
-            const pal = [];
-            for (let i = 0; i < 5; i++) {
-                const p = tctx.getImageData(Math.random()*tmp.width, Math.random()*tmp.height, 1, 1).data;
-                pal.push(`rgb(${p[0]},${p[1]},${p[2]})`);
-            }
-            runDraw(pal);
-        });
-
-        aiGenerateBtn.addEventListener('click', async () => {
-            if (!uploadedImage || !base64Image) return showError("写真を選択してください。");
-            if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette);
-            loadingOverlay.style.display = 'flex';
-            try {
-                const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "画像から分散した代表的な5色をJSON形式で返してください。 { \"palette\": [\"#hex1\", \"#hex2\", \"#hex3\", \"#hex4\", \"#hex5\"] }" }, { inlineData: { mimeType: "image/png", data: base64Image } }] }], generationConfig: { responseMimeType: "application/json" } })
-                });
-                const data = JSON.parse(res.candidates[0].content.parts[0].text);
-                runDraw(data.palette);
-            } catch (err) { showError("AI解析エラー。"); } finally { loadingOverlay.style.display = 'none'; }
-        });
-
-        downloadBtn.addEventListener('click', () => {
-            canvas.toBlob((b) => {
-                const u = URL.createObjectURL(b), a = document.createElement('a');
-                a.download = `PhotoFramerPro_${Date.now()}.png`; a.href = u; a.click();
-                setTimeout(() => URL.revokeObjectURL(u), 100);
-            }, 'image/png');
-        });
-
-        shareBtn.addEventListener('click', () => {
-            canvas.toBlob(async (b) => {
-                const f = new File([b], "photo.png", { type: "image/png" });
-                if (navigator.canShare && navigator.canShare({ files: [f] })) {
-                    await navigator.share({ files: [f], title: 'Photo Framer Pro', text: 'developed by @rinri_nri #PhotoFramer' });
-                } else { showError("共有未対応です。"); }
-            }, 'image/png');
-        });
+        async function runDraw(palette) { const fontName = document.querySelector('input[name="fontFamily"]:checked')?.value || 'Zen Maru Gothic'; loadingOverlay.style.display = 'flex'; try { await document.fonts.load(`10px "${fontName}"`); drawFrame({ palette }); } finally { loadingOverlay.style.display = 'none'; } }
+        generateBtn.addEventListener('click', () => { if (!uploadedImage) return showError("写真を選択してください。"); if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette); const tmp = document.createElement('canvas'); tmp.width = uploadedImage.width; tmp.height = uploadedImage.height; const tctx = tmp.getContext('2d'); tctx.drawImage(uploadedImage, 0, 0); const pal = []; for (let i = 0; i < 5; i++) { const p = tctx.getImageData(Math.random()*tmp.width, Math.random()*tmp.height, 1, 1).data; pal.push(`rgb(${p[0]},${p[1]},${p[2]})`); } runDraw(pal); });
+        aiGenerateBtn.addEventListener('click', async () => { if (!uploadedImage || !base64Image) return showError("写真を選択してください。"); if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette); loadingOverlay.style.display = 'flex'; try { const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "代表5色をJSONで返して。 { \"palette\": [\"#hex1\", \"...#hex5\"] }" }, { inlineData: { mimeType: "image/png", data: base64Image } }] }], generationConfig: { responseMimeType: "application/json" } }) }); const data = JSON.parse(res.candidates[0].content.parts[0].text); runDraw(data.palette); } catch (err) { showError("AI解析エラー。"); } finally { loadingOverlay.style.display = 'none'; } });
+        downloadBtn.addEventListener('click', () => { canvas.toBlob((b) => { const u = URL.createObjectURL(b), a = document.createElement('a'); a.download = `PhotoFramerPro_${Date.now()}.png`; a.href = u; a.click(); setTimeout(() => URL.revokeObjectURL(u), 100); }, 'image/png'); });
+        shareBtn.addEventListener('click', () => { canvas.toBlob(async (b) => { const f = new File([b], "photo.png", { type: "image/png" }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Photo Framer Pro', text: '#PhotoFramer' }); } else { showError("共有未対応です。"); } }, 'image/png'); });
     </script>
 </body>
 </html>
