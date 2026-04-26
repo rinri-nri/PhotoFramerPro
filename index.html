@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Framer & AI Mesh Gradient v52.0</title>
+    <title>Photo Framer & AI Mesh Gradient v53.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
@@ -29,7 +29,9 @@
         input[name="fontFamily"]:checked + span, input[name="textColor"]:checked + span, input[name="exifAlign"]:checked + span, input[name="exifWeight"]:checked + span { color: #6366f1; font-weight: 700; }
         .social-link { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #6366f1; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #6366f1; cursor: pointer; margin-top: -5px; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #e2e8f0; border-radius: 4px; }
         .dark input[type=range]::-webkit-slider-runnable-track { background: #374151; }
     </style>
@@ -249,10 +251,11 @@
                     <div class="p-3 border dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800/50"><strong>算数学習アプリ</strong><p class="opacity-70">現役講師設計の効率学習ツール。</p></div>
                 </div>
             </div>
-            <!-- VERSION HISTORY (Added v52.0) -->
+            <!-- VERSION HISTORY (Added v53.0 updated text) -->
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md col-span-1 md:col-span-2">
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-600 dark:text-blue-400"><i data-lucide="history" class="w-5 h-5"></i> アップデート履歴</h2>
                 <div class="space-y-2 text-[10px] max-h-[150px] overflow-y-auto pr-2">
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v53.0</strong><p>共有テキストのアップデート（URLと説明文を強化）。</p></div>
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v52.0</strong><p>アップデート履歴カードを設置。開発ログを一元化。</p></div>
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v51.0</strong><p>パレット（丸）表示ON/OFF、開発経緯のこだわり追記。</p></div>
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v50.0</strong><p>開発者メッセージを「ご飯情熱」版へ更新、リンク整備。</p></div>
@@ -260,9 +263,7 @@
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v48.0</strong><p>フォント変更が反映されない不具合をロード待機処理で修正。</p></div>
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v47.0</strong><p>プロフィールカード・制作物紹介・フォント34種への拡張。</p></div>
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v46.0</strong><p>ユーザーテキストのフォントサイズ調整スライダーを追加。</p></div>
-                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v45.0</strong><p>EXIF文字のサイズ・太さ・斜体等の詳細微調整機能を実装。</p></div>
                     <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v44.0</strong><p>EXIF自動抽出機能および配置（左・中・右）機能を追加。</p></div>
-                    <div class="flex gap-4 border-b border-slate-100 dark:border-gray-700 pb-1"><strong>v42.0</strong><p>テキストカラー（白・黒・灰）の一括変更ボタンを設置。</p></div>
                 </div>
             </div>
             <div class="card p-6 rounded-3xl border-2 border-slate-100 dark:border-gray-700 shadow-md col-span-1 md:col-span-2 opacity-80">
@@ -313,7 +314,8 @@
             ctx.globalAlpha = 1.0; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(uploadedImage, pad, pad);
             if (paletteToggle.checked) { const ds = extra * 0.09; palette.forEach((c, i) => { ctx.beginPath(); ctx.arc(pad + ds + (i * ds * 6.5), canvas.height - (extra * 0.65), ds, 0, Math.PI*2); ctx.fillStyle = c; ctx.fill(); }); }
             if (customTextInput.value.trim()) { ctx.fillStyle = `rgba(${baseColor}, 0.95)`; ctx.font = `italic 300 ${Math.floor(extra * parseFloat(userTextSizeRange.value))}px "${font}", sans-serif`; ctx.textAlign = "left"; ctx.fillText(customTextInput.value.trim(), pad, canvas.height - (extra*0.22)); }
-            ctx.fillStyle = `rgba(${baseColor}, 0.3)`; ctx.font = `300 ${Math.floor(extra*0.1)}px "${font}", sans-serif`; ctx.textAlign = "left"; ctx.fillText('Generated by "Photo Framer Pro" / @rinri_nri', pad, pad * 0.6);
+            ctx.fillStyle = `rgba(${baseColor}, 0.3)`; ctx.font = `300 ${Math.floor(extra*0.1)}px "${font}", sans-serif`;
+            ctx.textAlign = "left"; ctx.fillText('Generated by "Photo Framer Pro" / @rinri_nri', pad, pad * 0.6);
             if (dateToggle.checked) { const now = new Date(), d = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`; ctx.fillStyle = `rgba(${baseColor}, 0.6)`; ctx.font = `300 ${Math.floor(extra*0.14)}px "${font}", sans-serif`; ctx.textAlign = "right"; ctx.fillText(d, canvas.width - pad, pad * 0.65); }
             if (exifToggle.checked && exifInfo) { ctx.fillStyle = `rgba(${baseColor}, 0.5)`; ctx.font = `${exifItalic}${exifW} ${Math.floor(extra * parseFloat(exifSizeRange.value))}px "${font}", sans-serif`; ctx.textAlign = align; let exifX = align === 'left' ? pad : (align === 'right' ? canvas.width - pad : canvas.width / 2); ctx.fillText(exifInfo, exifX, canvas.height - (extra * 0.1)); }
             if (uploadedIcon) { const ir = extra * 0.25, ix = canvas.width - pad - (ir * 1.2), iy = pad + uploadedImage.height + (extra/2); ctx.save(); ctx.beginPath(); ctx.arc(ix, iy, ir, 0, Math.PI*2); ctx.clip(); const a = uploadedIcon.width / uploadedIcon.height; let dw, dh, dx, dy; if (a > 1) { dh = ir*2; dw = dh*a; dx = ix-dw/2; dy = iy-ir; } else { dw = ir*2; dh = dw/a; dx = ix-ir; dy = iy-dh/2; } ctx.drawImage(uploadedIcon, dx, dy, dw, dh); ctx.restore(); }
@@ -323,7 +325,16 @@
         generateBtn.addEventListener('click', () => { if (!uploadedImage) return showError("写真を選択してください。"); if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette); const tmp = document.createElement('canvas'); tmp.width = uploadedImage.width; tmp.height = uploadedImage.height; const tctx = tmp.getContext('2d'); tctx.drawImage(uploadedImage, 0, 0); const pal = []; for (let i = 0; i < 5; i++) { const p = tctx.getImageData(Math.random()*tmp.width, Math.random()*tmp.height, 1, 1).data; pal.push(`rgb(${p[0]},${p[1]},${p[2]})`); } runDraw(pal); });
         aiGenerateBtn.addEventListener('click', async () => { if (!uploadedImage || !base64Image) return showError("写真を選択してください。"); if (lockBgToggle.checked && lastPalette) return runDraw(lastPalette); loadingOverlay.style.display = 'flex'; try { const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: "代表5色をJSONで返して。 { \"palette\": [\"#hex1\", \"...#hex5\"] }" }, { inlineData: { mimeType: "image/png", data: base64Image } }] }], generationConfig: { responseMimeType: "application/json" } }) }); const data = JSON.parse(res.candidates[0].content.parts[0].text); runDraw(data.palette); } catch (err) { showError("AI解析エラー。"); } finally { loadingOverlay.style.display = 'none'; } });
         downloadBtn.addEventListener('click', () => { canvas.toBlob((b) => { const u = URL.createObjectURL(b), a = document.createElement('a'); a.download = `PhotoFramerPro_${Date.now()}.png`; a.href = u; a.click(); setTimeout(() => URL.revokeObjectURL(u), 100); }, 'image/png'); });
-        shareBtn.addEventListener('click', () => { canvas.toBlob(async (b) => { const f = new File([b], "photo.png", { type: "image/png" }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Photo Framer Pro', text: '#PhotoFramer' }); } else { showError("共有未対応です。"); } }, 'image/png'); });
+        shareBtn.addEventListener('click', () => { canvas.toBlob(async (b) => { 
+            const f = new File([b], "photo.png", { type: "image/png" }); 
+            if (navigator.canShare && navigator.canShare({ files: [f] })) { 
+                await navigator.share({ 
+                    files: [f], 
+                    title: 'Photo Framer Pro', 
+                    text: 'https://rinri-nri.github.io/PhotoFramerPro お気に入りの写真を、素敵なフレームに入れよう！@rinri_nri #PhotoFramerPro' 
+                }); 
+            } else { showError("共有未対応です。"); } 
+        }, 'image/png'); });
     </script>
 </body>
 </html>
